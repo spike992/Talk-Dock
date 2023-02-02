@@ -1,17 +1,44 @@
+//Vnos knjižnjic!
 const express = require('express')
 const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
 const { v4: uuidV4 } = require('uuid')
-const phpExpress = require('php-express')({
-  binPath: 'php'
+const mysql = require('mysql2');
+const bodyParser = require('body-parser');
+const path = require('path');
+
+// MYSQL Povezava!
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'gaspr',
+  password: 'gasper991',
+  database: 'talk_dock'
 });
 
-app.set('views', __dirname + '/views');
-app.engine('php', phpExpress.engine);
-app.set('view engine', 'php');
+connection.connect((err) => {
+  if (err) throw err;
+  console.log('Connected to MySQL database!');
+});
 
-app.all(/.+\.php$/, phpExpress.router);
+//mysql zapis
+app.use(bodyParser.urlencoded({ extended: false }));
+app.get('/register', function(req, res) {
+  res.render('register')
+});
+app.post('/register', function(req, res) {
+  const ime = req.body.username;
+  const email = req.body.email;
+  const geslo = req.body.password;
+  const sql = `INSERT INTO uporabniki (ime, email, geslo) VALUES ('${ime}', '${email}', '${geslo}')`;
+
+  connection.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(`New user created with username ${ime}`);
+    res.send(`New user created with username ${ime}`);
+  });
+});
+
 
 app.set('view engine', 'ejs')
 app.use('/public', express.static('public'));
@@ -28,10 +55,6 @@ app.get('/room', (req, res) => {
 
 app.get('/login', (req, res) => {
   res.render('login')
-})
-
-app.get('/register', (req, res) =>{
-  res.render('register')
 })
 
 app.get('/:room', (req, res) => {
