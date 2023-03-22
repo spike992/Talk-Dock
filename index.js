@@ -55,7 +55,6 @@ app.post('/login', function(req, res){
 });
 
 
-//uporaba .ejs datoteke kot zgradba strani
 app.set('view engine', 'ejs')
 app.use('/public', express.static('public'));
 
