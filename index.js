@@ -39,25 +39,35 @@ app.post('/register', function(req, res) {
   });
 });
 
-
+//uporaba .ejs datoteke kot zgradba strani
 app.set('view engine', 'ejs')
 app.use('/public', express.static('public'));
 
 
-
+//podstrani
 app.get('/', (req, res) => {
   res.redirect('/login')
 })
 
-app.get('/room', (req, res) => {
-  res.redirect(`/${uuidV4()}`)
-})
+app.get('/roomjoin', (req, res) => {
+  res.render('roomjoin');
+});
+
+app.post('/roomjoin', function(req, res) {
+  const koda1 = req.body.koda;
+  res.redirect(`/room/${koda1}`);
+});
+
 
 app.get('/login', (req, res) => {
   res.render('login')
 })
 
-app.get('/:room', (req, res) => {
+app.get('/room', (req, res) => {
+  res.redirect(`/room/${uuidV4()}`)
+})
+
+app.get('/room/:room', (req, res) => {
   res.render('room', { roomId: req.params.room })
 })
 
