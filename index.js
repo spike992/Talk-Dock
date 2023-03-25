@@ -8,6 +8,13 @@ const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const path = require('path');
 
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
+
+app.set('view engine', 'ejs')
+app.use('/public', express.static('public'));
+
 // MYSQL Povezava!
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -22,27 +29,30 @@ connection.connect((err) => {
 });
 
 //mysql zapis
-app.use(bodyParser.urlencoded({ extended: false }));
 app.get('/register', function(req, res) {
   res.render('register')
 });
-app.post('/register', function(req, res) {
-  const ime = req.body.username;
+
+app.post('/register', function(req, res){
+  const username = req.body.username;
   const email = req.body.email;
-  const geslo = req.body.password;
-  const sql = `INSERT INTO uporabniki (ime, email, geslo) VALUES ('${ime}', '${email}', '${geslo}')`;
+  const password = req.body.password;
+  const sql = `INSERT INTO uporabniki (ime, email, geslo) VALUES ('${username}', '${email}', '${password}')`;
 
   connection.query(sql, (err, result) => {
-    if (err) throw err;
-    console.log(`New user created with username ${ime}`);
-    res.send(`New user created with username ${ime}`);
+    if (err) {
+      io.emit('registerFail', '');
+    } else {
+      res.redirect('/login');
+    }
   });
 });
 
+
 app.post('/login', function(req, res){
-  const ime = req.body.user;
-  const geslo = req.body.passw;
-  const sql = `SELECT * FROM uporabniki WHERE ime = '${ime}' AND geslo = '${geslo}'`;
+  const username = req.body.user;
+  const password = req.body.passw;
+  const sql = `SELECT * FROM uporabniki WHERE ime = '${username}' AND geslo = '${password}'`;
 
   connection.query(sql, (err, result) => {
     if (err) throw err;
@@ -50,13 +60,10 @@ app.post('/login', function(req, res){
       res.redirect('/roomjoin');
     } else {
       io.emit('userLoginResult', result.length);
+      io.emit('loginFail', '');
     }
   });
 });
-
-
-app.set('view engine', 'ejs')
-app.use('/public', express.static('public'));
 
 
 //podstrani
