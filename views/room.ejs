@@ -12,21 +12,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatroom</title>
     <style>
-        #video-ovoj{
+        body {
+            background-color: #f8f8f8;
+            font-family: Arial, sans-serif;
+        }
+
+        #video-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, 300px);
             grid-auto-rows: 300px;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-        video{
+
+        video {
             width: 100%;
             height: 100%;
-            object-fit: center;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 75%; /* Set the aspect ratio for the video container */
+            overflow: hidden;
+        }
+
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-text {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            padding: 8px;
+            text-align: center;
         }
 
     </style>
 </head>
 <body>
-    <div id="video-ovoj">
+    <div id="video-grid">
 
     </div>
 </body>

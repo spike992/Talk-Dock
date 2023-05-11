@@ -7,7 +7,14 @@ const { v4: uuidV4 } = require('uuid')
 const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const path = require('path');
+const session = require('express-session');
 
+
+app.use(session({
+  secret: 'dfcghgfhfhnfcxf',
+  resave: false,
+  saveUninitialized: true
+}));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
@@ -57,6 +64,7 @@ app.post('/login', function(req, res){
   connection.query(sql, (err, result) => {
     if (err) throw err;
     if (result.length > 0) {
+      req.session.user = username;
       res.redirect('/roomjoin');
     } else {
       io.emit('userLoginResult', result.length);
@@ -65,17 +73,26 @@ app.post('/login', function(req, res){
   });
 });
 
+function requireLogin(req, res, next) {
+  if (req.session.user) {
+    next();
+  } else {
+    io.emit('prijavise', 'Prosim prijavi se!');
+    res.redirect('/login');
+  }
+}
+
 
 //podstrani
 app.get('/', (req, res) => {
   res.redirect('/login')
 })
 
-app.get('/roomjoin', (req, res) => {
+app.get('/roomjoin', requireLogin, function(req, res) {
   res.render('roomjoin');
 });
 
-app.post('/roomjoin', function(req, res) {
+app.post('/roomjoin', requireLogin, function(req, res) {
   const koda1 = req.body.koda;
   res.redirect(`/room/${koda1}`);
 });
@@ -85,11 +102,11 @@ app.get('/login', (req, res) => {
   res.render('login')
 })
 
-app.get('/room', (req, res) => {
+app.get('/room', requireLogin, (req, res) => {
   res.redirect(`/room/${uuidV4()}`)
 })
 
-app.get('/room/:room', (req, res) => {
+app.get('/room/:room', requireLogin, (req, res) => {
   res.render('room', { roomId: req.params.room })
 })
 
@@ -103,5 +120,10 @@ io.on('connection', socket => {
     })
   })
 })
+app.get('/logout', function(req, res) {
+  req.session.destroy(function() {
+    res.redirect('/');
+  });
+});
 
 server.listen(3000)

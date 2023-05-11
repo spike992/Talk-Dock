@@ -43,6 +43,7 @@
 			margin-bottom: 20px;
 			border: 1px solid #ddd;
 			border-radius: 5px;
+			left: 20px;
 		}
 
 		button {
@@ -77,7 +78,7 @@
 
 
 		<a href="#" id="pozabilgeslo">Pozabil geslo?</a>
-
+		<a href="../register" id="registriraj">Nimaš računa?</a>
 		<button>LOGIN</button>
 
 	</form>
@@ -104,6 +105,9 @@
 		usernameInput.classList.add('login-form-fail');
 		passwordInput.classList.add('login-form-fail');
 	});
+	socket.on('prijavise', () =>{
+		alert('Prosim prijavi se!');
+	})
 </script>
 
 
