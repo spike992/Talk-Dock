@@ -8,6 +8,7 @@ const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const path = require('path');
 const session = require('express-session');
+let ime = "";
 
 
 app.use(session({
@@ -24,16 +25,32 @@ app.use('/public', express.static('public'));
 
 // MYSQL Povezava!
 const connection = mysql.createConnection({
-  host: 'localhost',
+  host: '192.168.64.111',
   user: 'gaspr',
   password: 'gasper991',
-  database: 'talk_dock'
+  database: 'talk_dock',
+  port: '3306'
 });
 
 connection.connect((err) => {
   if (err) throw err;
   console.log('Connected to MySQL database!');
 });
+const table = `CREATE TABLE IF NOT EXISTS uporabniki (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  ime VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  geslo VARCHAR(255) NOT NULL
+  );`
+
+connection.query(table, (err, result) =>{
+  if (err){
+    console.log(err);
+  }
+  else{
+    
+  }
+})
 
 //mysql zapis
 app.get('/register', function(req, res) {
@@ -65,6 +82,8 @@ app.post('/login', function(req, res){
     if (err) throw err;
     if (result.length > 0) {
       req.session.user = username;
+
+      ime = username;
       res.redirect('/roomjoin');
     } else {
       io.emit('userLoginResult', result.length);
@@ -112,14 +131,25 @@ app.get('/room/:room', requireLogin, (req, res) => {
 
 io.on('connection', socket => {
   socket.on('join-room', (roomId, userId) =>{
-    socket.join(roomId)
-    socket.to(roomId).broadcast.emit('user-connected', userId)
+    socket.join(roomId);
+    socket.to(roomId).broadcast.emit('user-connected', userId);
+
+    const imeFromServer = ime; // Set the value based on your server-side logic
+
+    socket.emit('ime', imeFromServer); // Emit the value to the client
+
+
+    socket.on('chat message', (data) => {
+      console.log(data.ime);
+      console.log(data.msg);
+      io.emit('chat message', data);
+    });
 
     socket.on('disconnect', () =>{
-      socket.to(roomId).broadcast.emit('user-disconnected', userId)
+      socket.to(roomId).broadcast.emit('user-disconnected', userId);
     })
   })
-})
+});
 app.get('/logout', function(req, res) {
   req.session.destroy(function() {
     res.redirect('/');
