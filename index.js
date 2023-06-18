@@ -11,7 +11,7 @@ const session = require('express-session');
 let ime = "";
 const sgMail = require('@sendgrid/mail')
 //sgMail.setApiKey(process.env.SENDGRID_API_KEY)
-sgMail.setApiKey('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');
+sgMail.setApiKey('twilio');
 
 
 app.use(session({
