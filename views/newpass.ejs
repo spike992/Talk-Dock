@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Spremeni Geslo</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		body {
+			background-color: #f8f8f8;
+			font-family: Arial, sans-serif;
+		}
+
+		h1 {
+			text-align: center;
+		}
+		h2{
+			text-align: center;
+		}
+		form {
+			max-width: 400px;
+			margin: 0 auto;
+			padding: 20px;
+			background-color: #fff;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+			box-shadow: 0px 0px 5px #ddd;
+		}
+
+		label {
+			display: block;
+			font-weight: bold;
+			margin-bottom: 5px;
+		}
+
+		input[type="password1"],
+		input[type="password2"],
+		input[type="email"] {
+			display: block;
+			width: 95%;
+			padding: 10px;
+			margin-bottom: 20px;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+		}
+
+		button {
+			background-color: #4CAF50;
+			border: none;
+			color: white;
+			padding: 10px 20px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+
+		a {
+			display: block;
+			text-align: right;
+			margin-top: 10px;
+		}
+
+	</style>
+</head>
+<body>
+
+	<h1>Talk-dock</h1>
+	<h2>Spremeni geslo</h2>
+	<div class="ovoj">
+	<form action="/newpass" method="post" id="geslo-form">
+        <input type="email" placeholder="Napiši svoj email" id="email" name="email"/>
+		<input type="password1" placeholder="Napiši novo geslo" id="password1" name="password1"/>
+		<input type="password2" placeholder="Ponovi novo geslo" id="password2" name="password2"/>
+
+		<a href="../register" id="registriraj">Nimaš računa?</a>
+		<button type="submit">SPREMENI GESLO</button>
+
+	</form>
+	</div>
+</body>
+</html>
