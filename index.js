@@ -9,6 +9,9 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const session = require('express-session');
 let ime = "";
+const sgMail = require('@sendgrid/mail')
+//sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+sgMail.setApiKey('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');
 
 
 app.use(session({
@@ -25,9 +28,9 @@ app.use('/public', express.static('public'));
 
 // MYSQL Povezava!
 const connection = mysql.createConnection({
-  host: '192.168.64.111',
+  host: 'localhost',
   user: 'gaspr',
-  password: 'gasper991',
+  password: 'your_password',
   database: 'talk_dock',
   port: '3306'
 });
@@ -48,7 +51,6 @@ connection.query(table, (err, result) =>{
     console.log(err);
   }
   else{
-    
   }
 })
 
@@ -123,6 +125,58 @@ app.get('/login', (req, res) => {
 
 app.get('/room', requireLogin, (req, res) => {
   res.redirect(`/room/${uuidV4()}`)
+})
+
+app.get('/forgotpass', (req, res) =>{
+  res.render('forgotpass');
+});
+
+app.get('/newpass', (req, res) =>{
+  res.render('newpass');
+});
+
+app.post('/newpass', (req, res) =>{
+  const mail = req.body.email;
+  const geslo1 = req.body.password1;
+  const geslo2 = req.body.password2;
+  const sql = `UPDATE uporabniki SET geslo = '${geslo1}' WHERE email = '${mail}';`;
+  if (geslo1 == geslo2){
+    connection.query(sql, (err, result) => {
+      if (err) {
+        io.emit('spremembaFail', '');
+      } else {
+        res.redirect('/login');
+      }
+    });
+  }
+});
+
+app.post('/forgotpass', (req, res) =>{
+  const mail = req.body.email;
+  const sql = `SELECT email from uporabniki where email = '${mail}';`;
+  const msg = {
+    to: mail, // Change to your recipient
+    from: 'gapihokej@gmail.com', // Change to your verified sender
+    subject: 'Spremenite geslo',
+    text: 'Pojdite na http://localhost:3000/newpass, da zamenjate geslo!',
+    html: '<strong>Pojdite na http://localhost:3000/newpass, da zamenjate geslo!</strong>',
+  }
+  connection.query(sql, (err, result) =>{
+    if (err) throw err;
+    if (result) {
+      sgMail
+      .send(msg)
+      .then(() => {
+        console.log('Email sent')
+        res.redirect('../login')
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+    } else {
+      io.emit('mailneobstaja', mail)
+    }
+  })
 })
 
 app.get('/room/:room', requireLogin, (req, res) => {
