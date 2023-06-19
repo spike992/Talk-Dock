@@ -30,6 +30,10 @@ navigator.mediaDevices.getUserMedia({
         connectToNewUser(userId, stream)
     })
 })
+.catch(error => {
+    // Handle permission error or provide feedback to the user
+    console.error('Error accessing microphone and camera:', error);
+  });
 
 var messages = document.getElementById('messages');
 var form = document.getElementById('form');

@@ -1,18 +1,30 @@
 //Vnos knjižnjic!
 const express = require('express')
 const app = express()
-const server = require('http').Server(app)
-const io = require('socket.io')(server)
+
 const { v4: uuidV4 } = require('uuid')
 const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const path = require('path');
 const session = require('express-session');
 let ime = "";
+const https = require('https');
+const fs = require('fs');
 const sgMail = require('@sendgrid/mail')
-//sgMail.setApiKey(process.env.SENDGRID_API_KEY)
-sgMail.setApiKey('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');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+//sgMail.setApiKey('');
 
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/talkdock.duckdns.org/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/talkdock.duckdns.org/fullchain.pem', 'utf8');
+const ca = fs.readFileSync('/etc/letsencrypt/live/talkdock.duckdns.org/fullchain.pem', 'utf8');
+const credentials = { key: privateKey, cert: certificate, ca: ca};
+
+const httpsServer = https.createServer(credentials, app);
+httpsServer.listen(3000, () => {
+  console.log(`Server is running on port ${3000}`);
+});
+
+const io = require('socket.io').listen(httpsServer)
 
 app.use(session({
   secret: 'dfcghgfhfhnfcxf',
@@ -210,4 +222,3 @@ app.get('/logout', function(req, res) {
   });
 });
 
-server.listen(3000)
