@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Login V1</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		.login-form-fail{
+			background-color: red;
+		}
+		body {
+			background-color: #f8f8f8;
+			font-family: Arial, sans-serif;
+		}
+
+		h1 {
+			text-align: center;
+		}
+		h2{
+			text-align: center;
+		}
+		form {
+			max-width: 400px;
+			margin: 0 auto;
+			padding: 20px;
+			background-color: #fff;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+			box-shadow: 0px 0px 5px #ddd;
+		}
+
+		label {
+			display: block;
+			font-weight: bold;
+			margin-bottom: 5px;
+		}
+
+		input[type="text"],
+		input[type="password"] {
+			display: block;
+			width: 95%;
+			padding: 10px;
+			margin-bottom: 20px;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+		}
+
+		button {
+			background-color: #4CAF50;
+			border: none;
+			color: white;
+			padding: 10px 20px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+
+		a {
+			display: block;
+			text-align: right;
+			margin-top: 10px;
+		}
+
+	</style>
+</head>
+<body>
+
+	<h1>Talk-dock</h1>
+	<h2>Login</h2>
+	<div class="ovoj">
+	<form action="/login" method="post" id="login-form">
+		<input type="text" placeholder="Napiši uporabniško ime" id="user" name="user"/>
+		<input type="password" placeholder="Napisi geslo" id="passw" name="passw"/>
+
+
+		<a href="../forgotpass" id="pozabilgeslo">Pozabil geslo?</a>
+		<a href="../register" id="registriraj">Nimaš računa?</a>
+		<button>LOGIN</button>
+
+	</form>
+
+	</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script defer>
+	const socket = io();
+
+	const loginForm = document.querySelector('form');
+	const usernameInput = document.querySelector('#user');
+	const passwordInput = document.querySelector('#passw');
+
+	loginForm.addEventListener('submit', (event) => {
+
+		socket.emit('login', {
+		username: usernameInput.value,
+		password: passwordInput.value
+		});
+	});
+
+	socket.on('loginFail', () => {
+		usernameInput.classList.add('login-form-fail');
+		passwordInput.classList.add('login-form-fail');
+	});
+	socket.on('prijavise', () =>{
+		alert('Prosim prijavi se!');
+	})
+</script>
+
+
+</body>
+</html>
